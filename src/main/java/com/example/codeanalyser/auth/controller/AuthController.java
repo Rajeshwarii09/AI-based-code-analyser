@@ -2,6 +2,9 @@ package com.example.codeanalyser.auth.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,19 +56,23 @@ public class AuthController {
     }
 
     // Login endpoint
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElse(null);
+    @Autowired
+private AuthenticationManager authenticationManager;
 
-        if (user == null) {
-            return ResponseEntity.status(401).body("Invalid username or password");
-        }
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            return ResponseEntity.status(401).body("Invalid username or password");
-        }
+@PostMapping("/login")
+public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
+    try {
+        // Authenticate using Spring Security's authentication manager
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                request.getUsername(), request.getPassword()));
 
-        String token = jwtUtil.generateToken(user.getUsername());
+        // If no exception, generate JWT token
+        String token = jwtUtil.generateToken(request.getUsername());
         return ResponseEntity.ok(new JwtResponse(token));
+    } catch (BadCredentialsException e) {
+        return ResponseEntity.status(401).body("Invalid username or password");
     }
+}
+
 }
