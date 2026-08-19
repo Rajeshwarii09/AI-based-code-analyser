@@ -30,7 +30,7 @@ public class CodeSnippetService {
         CodeSnippet savedSnippet = codeSnippetRepository.save(snippet);
 
         // Publish snippet ID to Kafka topic for analysis
-        // kafkaProducerService.sendSnippetId(savedSnippet.getId());
+        kafkaProducerService.sendSnippetId(savedSnippet.getId());
 
         return savedSnippet;
     }
