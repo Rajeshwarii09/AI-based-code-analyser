@@ -2,6 +2,8 @@ package com.example.codeanalyser.auth.service;
 
 import java.util.Collections;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,21 +17,22 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    // Constructor for dependency injection
+    @Autowired
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    // Load user by username for authentication
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                      .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-        // Return Spring Security UserDetails object with username, password, and roles/authorities
+        // Here, roles can be added to authorities if you implement them
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPasswordHash(),
-                Collections.emptyList()   // you can add roles/authorities here if you have them
+            user.getUsername(),
+            user.getPasswordHash(),
+            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")) // default role
         );
     }
 }
