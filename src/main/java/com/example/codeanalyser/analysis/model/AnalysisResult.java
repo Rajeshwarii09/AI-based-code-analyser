@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity
 @Table(name = "analysis_results")
 public class AnalysisResult {
@@ -17,19 +19,26 @@ public class AnalysisResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "snippet_id")
     private Long snippetId;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "feedback")
     private String result;
 
     private String status;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "analyzed_at")
     private LocalDateTime analyzedAt;
 
     // Getters and setters
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getSnippetId() {
