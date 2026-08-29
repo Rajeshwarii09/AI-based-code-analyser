@@ -1,7 +1,6 @@
 package com.example.codeanalyser.codesnippet.model;
 
 import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +8,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * Entity representing a code snippet stored in the database.
+ */
 @Entity
 @Table(name = "code_snippets")
 public class CodeSnippet {
@@ -26,7 +28,6 @@ public class CodeSnippet {
 
     private String status;
 
-    // Constructors
     public CodeSnippet() {
     }
 
@@ -37,7 +38,7 @@ public class CodeSnippet {
         this.status = status;
     }
 
-    // Getters and setters omitted for brevity; add them here or use Lombok if preferred
+    // Getters and setters below
 
     public Long getId() {
         return id;

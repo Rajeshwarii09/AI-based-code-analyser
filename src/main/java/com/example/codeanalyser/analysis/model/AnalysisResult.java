@@ -1,7 +1,13 @@
 package com.example.codeanalyser.analysis.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "analysis_results")
@@ -22,16 +28,39 @@ public class AnalysisResult {
 
     // Getters and setters
 
-    public Long getId() { return id; }
-    public Long getSnippetId() { return snippetId; }
-    public void setSnippetId(Long snippetId) { this.snippetId = snippetId; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getResult() { return result; }
-    public void setResult(String result) { this.result = result; }
+    public Long getSnippetId() {
+        return snippetId;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public void setSnippetId(Long snippetId) {
+        this.snippetId = snippetId;
+    }
 
-    public LocalDateTime getAnalyzedAt() { return analyzedAt; }
-    public void setAnalyzedAt(LocalDateTime analyzedAt) { this.analyzedAt = analyzedAt; }
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getAnalyzedAt() {
+        return analyzedAt;
+    }
+
+    public void setAnalyzedAt(LocalDateTime analyzedAt) {
+        this.analyzedAt = analyzedAt;
+    }
 }

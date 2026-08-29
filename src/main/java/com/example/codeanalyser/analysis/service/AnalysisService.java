@@ -16,44 +16,48 @@ public class AnalysisService {
     private final CodeSnippetRepository codeSnippetRepository;
     private final AnalysisResultRepository analysisResultRepository;
 
+    // Constructor injection of repositories for database access
     public AnalysisService(CodeSnippetRepository codeSnippetRepository,
                            AnalysisResultRepository analysisResultRepository) {
         this.codeSnippetRepository = codeSnippetRepository;
         this.analysisResultRepository = analysisResultRepository;
     }
 
+    // Method to analyze a code snippet by its ID
     public void analyzeSnippet(Long snippetId) {
-        Optional<CodeSnippet> snippetOpt = codeSnippetRepository.findById(snippetId);
 
-        if (snippetOpt.isEmpty()) {
-            System.err.println("Code snippet not found for ID: " + snippetId);
+        // Line 1: Fetch the snippet from DB using the snippet id
+        Optional<CodeSnippet> snippetOptional = codeSnippetRepository.findById(snippetId);
+
+        // Line 2: If snippet not found, stop processing
+        if (snippetOptional.isEmpty()) {
+            System.err.println("Snippet not found: ID = " + snippetId);
             return;
         }
 
-        CodeSnippet snippet = snippetOpt.get();
+        CodeSnippet snippet = snippetOptional.get();
 
-        // Simulate analysis logic (replace this with your real AI/static analysis)
-        String analysisResultText = performDummyAnalysis(snippet.getContent());
+        // Line 3: Simple dummy analysis - count lines in the code snippet
+        String code = snippet.getContent();
+        int lineCount = code.split("\\r?\\n").length;
 
-        // Save analysis result to database
+        // Line 4: Prepare the analysis result text
+        String analysisResult = "Code length: " + code.length() + " characters; Number of lines: " + lineCount;
+
+        // Line 5: Create a new AnalysisResult entity and set the results
         AnalysisResult result = new AnalysisResult();
         result.setSnippetId(snippetId);
-        result.setResult(analysisResultText);
+        result.setResult(analysisResult);        // Store the analysis message
         result.setStatus("COMPLETED");
         result.setAnalyzedAt(LocalDateTime.now());
 
+        // Line 6: Save the analysis result in the database
         analysisResultRepository.save(result);
 
-        // Optionally update snippet status
+        // Line 7: Update snippet status to "ANALYZED"
         snippet.setStatus("ANALYZED");
         codeSnippetRepository.save(snippet);
 
         System.out.println("Analysis completed for snippet ID: " + snippetId);
-    }
-
-    private String performDummyAnalysis(String code) {
-        // Simple dummy check: count lines
-        int lines = code.split("\\r?\\n").length;
-        return "Code analysis: Number of lines = " + lines;
     }
 }

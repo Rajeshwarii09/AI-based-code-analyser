@@ -2,8 +2,13 @@ package com.example.codeanalyser.analysis.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
+import java.util.List;
 import com.example.codeanalyser.analysis.model.AnalysisResult;
 
 @Repository
-public interface AnalysisResultRepository extends JpaRepository<AnalysisResult, Long> {}
+public interface AnalysisResultRepository extends JpaRepository<AnalysisResult, Long> {
+
+    // Find all analysis results for a snippet (assuming multiple results possible)
+    List<AnalysisResult> findBySnippetId(Long snippetId);
+
+}
