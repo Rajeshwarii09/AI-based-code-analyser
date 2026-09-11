@@ -28,6 +28,8 @@ public class CodeSnippet {
 
     private String status;
 
+    private String language;
+
     public CodeSnippet() {
     }
 
@@ -74,5 +76,13 @@ public class CodeSnippet {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

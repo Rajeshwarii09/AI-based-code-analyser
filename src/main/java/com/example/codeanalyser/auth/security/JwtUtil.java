@@ -1,6 +1,7 @@
 package com.example.codeanalyser.auth.security;
 
 import java.util.Date;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,17 +17,18 @@ public class JwtUtil {
     private String SECRET_KEY; // keep it secure!
 
     public String generateToken(String username) {
-        return Jwts.builder()
+         var signingKey = signingKey();
+         return Jwts.builder()
                    .setSubject(username)
                    .setIssuedAt(new Date(System.currentTimeMillis()))
                    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
-                   .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
+                   .signWith(signingKey, SignatureAlgorithm.HS256)
                    .compact();
     }
 
     public String extractUsername(String token) {
         return Jwts.parserBuilder()
-                   .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                   .setSigningKey(signingKey())
                    .build()
                    .parseClaimsJws(token)
                    .getBody()
@@ -40,11 +42,20 @@ public class JwtUtil {
 
     private boolean isTokenExpired(String token) {
         Date expiration = Jwts.parserBuilder()
-                              .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                              .setSigningKey(signingKey())
                               .build()
                               .parseClaimsJws(token)
                               .getBody()
                               .getExpiration();
         return expiration.before(new Date());
+    }
+
+    private javax.crypto.SecretKey signingKey() {
+        byte[] secret = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
+        if (secret.length < 32) {
+            throw new IllegalStateException(
+                "JWT secret must be at least 32 bytes. Set JWT_SECRET to a long random value.");
+        }
+        return Keys.hmacShaKeyFor(secret);
     }
 }

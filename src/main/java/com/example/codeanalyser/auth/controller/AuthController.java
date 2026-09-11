@@ -3,7 +3,7 @@ package com.example.codeanalyser.auth.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import com.example.codeanalyser.auth.dto.JwtResponse;
 import com.example.codeanalyser.auth.dto.LoginRequest;
@@ -40,9 +41,12 @@ public class AuthController {
 
     // Registration endpoint
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             return ResponseEntity.badRequest().body("Username is already taken");
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity.badRequest().body("Email is already registered");
         }
 
         User newUser = new User();
@@ -60,7 +64,7 @@ public class AuthController {
 private AuthenticationManager authenticationManager;
 
 @PostMapping("/login")
-public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
+public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest request) {
     try {
         // Authenticate using Spring Security's authentication manager
         authenticationManager.authenticate(
@@ -70,7 +74,7 @@ public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
         // If no exception, generate JWT token
         String token = jwtUtil.generateToken(request.getUsername());
         return ResponseEntity.ok(new JwtResponse(token));
-    } catch (BadCredentialsException e) {
+    } catch (AuthenticationException e) {
         return ResponseEntity.status(401).body("Invalid username or password");
     }
 }
